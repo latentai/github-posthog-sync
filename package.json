@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple tool to sync your GitHub traffic stats to PostHog",
   "license": "MIT",
+  "type": "module",
   "author": {
     "name": "Isaac Whitfield",
     "email": "iw@whitfin.io"
