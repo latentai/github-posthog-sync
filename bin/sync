@@ -16,7 +16,11 @@ for await (let repo of github.getRepositories()) {
   for await (let stat of github.getRepositoryStats(repo)) {
     await posthog.register(repo, stat);
   }
+
+  // flush every repo
+  await posthog.flush();
 }
 
-// flush buffer and end
+// final flushing
+await posthog.flush();
 await posthog.shutdown();
