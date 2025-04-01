@@ -44,12 +44,11 @@ This means that every day is indexed 14 times (i.e. once a day for two weeks) un
 out. Fortunately we know that PostHog is based on ClickHouse which will enforce deduplication
 (last one in) based on a combination of these 4 fields in the event:
 
-* `uuid`
-* `name`
-* `timestamp`
-* `distinct_id`
+- `uuid`
+- `name`
+- `timestamp`
+- `distinct_id`
 
 The sync will use deterministic fields for these values (via UUID v5) to ensure that they're
 the same for the same day. ClickHouse provide eventual consistency when it comes to deduplication,
 so over time and "old" copies of the events will age out.
-
