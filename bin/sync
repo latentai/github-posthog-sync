@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+import 'dotenv/config';
+
+import github from '../lib/github.js';
+import posthog from '../lib/posthog.js';
+import { SYNC_ALLOW_FORKS } from '../lib/config.js';
+
+// fetch all the repositories for the user/org
+for await (let repo of github.getRepositories()) {
+  // skip any forks if we don't want
+  if (repo.fork && !SYNC_ALLOW_FORKS) {
+    continue;
+  }
+
+  // fetch and record all repository statistics in PostHog
+  for await (let stat of github.getRepositoryStats(repo)) {
+    await posthog.register(repo, stat);
+  }
+}
+
+// flush buffer and end
+await posthog.shutdown();
