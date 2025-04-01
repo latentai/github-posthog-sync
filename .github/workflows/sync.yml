@@ -26,4 +26,3 @@ jobs:
           SYNC_POSTHOG_KEY: ${{ secrets.SYNC_POSTHOG_KEY }}
           SYNC_POSTHOG_URL: ${{ secrets.SYNC_POSTHOG_URL }}
           SYNC_ALLOW_FORKS: ${{ secrets.SYNC_ALLOW_FORKS }}
-

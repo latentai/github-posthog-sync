@@ -15,7 +15,6 @@
     "email": "iw@whitfin.io",
     "url": "http://github.com/whitfin/github-posthog-sync/issues"
   },
-  "keywords": [],
   "scripts": {
     "format": "prettier --write .",
     "start": "node bin/sync",
