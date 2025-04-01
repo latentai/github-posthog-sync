@@ -16,6 +16,9 @@ All secrets are automatically masked in build logs by GitHub, so any key
 are protected out of the box. The section below will document any options
 you need to provide to get up and running; only a couple!
 
+Please note you will have to enable the workflow inside your repository;
+this is due to GitHub disabling builds on forks by default.
+
 ## Configuration
 
 There are several options you must provide before running this tool. Options
