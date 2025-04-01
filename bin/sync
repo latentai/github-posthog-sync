@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 
-import github from '../lib/github.js';
 import posthog from '../lib/posthog.js';
+import * as github from '../lib/github.js';
 import { SYNC_ALLOW_FORKS } from '../lib/config.js';
 
 // fetch all the repositories for the user/org
