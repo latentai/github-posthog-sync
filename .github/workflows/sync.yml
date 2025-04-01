@@ -22,9 +22,11 @@ jobs:
       - name: Run traffic sync
         run: npm run sync
         env:
+          SYNC_DEBUG: ${{ secrets.SYNC_DEBUG }}
           SYNC_GITHUB_ID: ${{ secrets.SYNC_GITHUB_ID }}
           SYNC_GITHUB_KEY: ${{ secrets.SYNC_GITHUB_KEY }}
           SYNC_GITHUB_URL: ${{ secrets.SYNC_GITHUB_URL }}
           SYNC_POSTHOG_KEY: ${{ secrets.SYNC_POSTHOG_KEY }}
           SYNC_POSTHOG_URL: ${{ secrets.SYNC_POSTHOG_URL }}
           SYNC_ALLOW_FORKS: ${{ secrets.SYNC_ALLOW_FORKS }}
+          SYNC_ALLOW_PRIVATE: ${{ secrets.SYNC_ALLOW_PRIVATE }}
