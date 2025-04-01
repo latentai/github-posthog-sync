@@ -3,12 +3,17 @@ import 'dotenv/config';
 
 import posthog from '../lib/posthog.js';
 import * as github from '../lib/github.js';
-import { SYNC_ALLOW_FORKS } from '../lib/config.js';
+import { SYNC_ALLOW_FORKS, SYNC_ALLOW_PRIVATE } from '../lib/config.js';
 
 // fetch all the repositories for the user/org
 for await (let repo of github.getRepositories()) {
   // skip any forks if we don't want
   if (repo.fork && !SYNC_ALLOW_FORKS) {
+    continue;
+  }
+
+  // skip any private if we don't want
+  if (repo.private && !SYNC_ALLOW_PRIVATE) {
     continue;
   }
 
