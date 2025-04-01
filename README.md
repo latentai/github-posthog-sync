@@ -19,16 +19,14 @@ you need to provide to get up and running; only a couple!
 ## Configuration
 
 There are several options you must provide before running this tool. Options
-are provided as environment variables, either manually or via `.env`. The
-required options are as follows:
+are provided as environment variables, either manually or via `.env`. You can
+look inside `.env.sample` for the full list of supported options, along with
+their defaults. The required options are as follows:
 
 ```
 SYNC_GITHUB_KEY=github_pat_*
 SYNC_POSTHOG_KEY=phc_*
 ```
-
-You can look inside `.env.sample` for the full list of supported options,
-along with their defaults.
 
 By default this tool wil run against the authenticated user, but you can
 point it to another user or organization via `SYNC_GITHUB_ID`:
