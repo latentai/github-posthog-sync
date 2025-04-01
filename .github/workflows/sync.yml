@@ -6,9 +6,11 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  update-repo:
+  sync:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
