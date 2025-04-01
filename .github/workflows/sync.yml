@@ -20,7 +20,7 @@ jobs:
         run: npm install
 
       - name: Run traffic sync
-        run: npx sync
+        run: npm run sync
         env:
           SYNC_GITHUB_ID: ${{ secrets.SYNC_GITHUB_ID }}
           SYNC_GITHUB_KEY: ${{ secrets.SYNC_GITHUB_KEY }}
