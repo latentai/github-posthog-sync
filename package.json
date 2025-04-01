@@ -1,7 +1,7 @@
 {
   "name": "github-posthog-sync",
   "version": "1.0.0",
-  "description": "Sync your GitHub traffic stats to PostHog",
+  "description": "A simple tool to sync your GitHub traffic stats to PostHog",
   "license": "MIT",
   "author": {
     "name": "Isaac Whitfield",
@@ -18,7 +18,8 @@
   "keywords": [],
   "scripts": {
     "format": "prettier --write .",
-    "start": "node bin/sync"
+    "start": "node bin/sync",
+    "sync": "node bin/sync"
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
