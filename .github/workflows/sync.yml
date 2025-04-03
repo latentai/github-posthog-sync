@@ -1,32 +1,32 @@
 name: Daily PostHog Sync
 
 on:
-    workflow_dispatch:
-    schedule:
-        - cron: 0 1 * * *
+  workflow_dispatch:
+  schedule:
+    - cron: 0 1 * * *
 
 jobs:
-    sync:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-            - name: Install dependencies
-              run: npm install
+      - name: Install dependencies
+        run: npm install
 
-            - name: Run traffic sync
-              run: npm run sync
-              env:
-                  SYNC_DEBUG: ${{ secrets.SYNC_DEBUG }}
-                  SYNC_GITHUB_ID: ${{ secrets.SYNC_GITHUB_ID }}
-                  SYNC_GITHUB_KEY: ${{ secrets.SYNC_GITHUB_KEY }}
-                  SYNC_GITHUB_URL: ${{ secrets.SYNC_GITHUB_URL }}
-                  SYNC_POSTHOG_KEY: ${{ secrets.SYNC_POSTHOG_KEY }}
-                  SYNC_POSTHOG_URL: ${{ secrets.SYNC_POSTHOG_URL }}
-                  SYNC_ALLOW_FORKS: ${{ secrets.SYNC_ALLOW_FORKS }}
-                  SYNC_ALLOW_PRIVATE: ${{ secrets.SYNC_ALLOW_PRIVATE }}
+      - name: Run traffic sync
+        run: npm run sync
+        env:
+          SYNC_DEBUG: ${{ secrets.SYNC_DEBUG }}
+          SYNC_GITHUB_ID: ${{ secrets.SYNC_GITHUB_ID }}
+          SYNC_GITHUB_KEY: ${{ secrets.SYNC_GITHUB_KEY }}
+          SYNC_GITHUB_URL: ${{ secrets.SYNC_GITHUB_URL }}
+          SYNC_POSTHOG_KEY: ${{ secrets.SYNC_POSTHOG_KEY }}
+          SYNC_POSTHOG_URL: ${{ secrets.SYNC_POSTHOG_URL }}
+          SYNC_ALLOW_FORKS: ${{ secrets.SYNC_ALLOW_FORKS }}
+          SYNC_ALLOW_PRIVATE: ${{ secrets.SYNC_ALLOW_PRIVATE }}
