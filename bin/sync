@@ -19,7 +19,7 @@ for await (let repo of github.getRepositories()) {
 
     // fetch and record all repository statistics in PostHog
     for await (let stat of github.getRepositoryStats(repo)) {
-        await posthog.register(repo, stat);
+        posthog.register(repo, stat);
     }
 
     // flush every repo
