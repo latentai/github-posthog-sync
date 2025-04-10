@@ -31,8 +31,8 @@ GPS_GITHUB_KEY=github_pat_*
 GPS_POSTHOG_KEY=phc_*
 ```
 
-By default this tool wil run against the authenticated user, but you can
-point it to another user or organization via `GPS_GITHUB_ID`:
+By default this tool wil run against the authenticated user via the provided
+token, but you can point it to another user or organization via `GPS_GITHUB_ID`:
 
 ```
 GPS_GITHUB_ID=whitfin
@@ -74,7 +74,7 @@ to be updated at by GitHub on that frequency.
 ## Development
 
 If you wish to run this tool manually, you will need to have [Elixir](https://elixir-lang.org)
-installed. From there, the easiest way to run it is via Mix:
+installed. Once you have this installed, the easiest way to run it is via Mix:
 
 ```bash
 $ mix deps.get
