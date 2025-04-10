@@ -27,15 +27,15 @@ look inside `.env.sample` for the full list of supported options, along with
 their defaults. The required options are as follows:
 
 ```
-SYNC_GITHUB_KEY=github_pat_*
-SYNC_POSTHOG_KEY=phc_*
+GPS_GITHUB_KEY=github_pat_*
+GPS_POSTHOG_KEY=phc_*
 ```
 
 By default this tool wil run against the authenticated user, but you can
-point it to another user or organization via `SYNC_GITHUB_ID`:
+point it to another user or organization via `GPS_GITHUB_ID`:
 
 ```
-SYNC_GITHUB_ID=whitfin
+GPS_GITHUB_ID=whitfin
 ```
 
 Your GitHub token must have the read-only `Administration` scope for the
@@ -70,3 +70,17 @@ This also means that the time of day the sync runs is irrelevant, because the on
 value for a day which "matters" happens during the sync 14 days after it occured.
 There is no point running the sync more than once per day, as traffic stats appear
 to be updated at by GitHub on that frequency.
+
+## Development
+
+If you wish to run this tool manually, you will need to have [Elixir](https://elixir-lang.org)
+installed. From there, the easiest way to run it is via Mix:
+
+```bash
+$ mix deps.get
+$ mix sync
+```
+
+The code is pretty simple, but if you have any issues please let me know! At some
+point in future I'd like to adopt the [posthog-elixir](https://github.com/PostHog/posthog-elixir)
+client, but for the time being it lacks support for the `uuid` field we require.

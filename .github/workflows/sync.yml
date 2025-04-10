@@ -8,25 +8,28 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    container:
+      image: elixir:1.18
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: Install dependencies
-        run: npm install
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get
+
+      - name: Compile application
+        run: mix compile
 
       - name: Run traffic sync
-        run: npm run sync
+        run: mix sync
         env:
-          SYNC_DEBUG: ${{ secrets.SYNC_DEBUG }}
-          SYNC_GITHUB_ID: ${{ secrets.SYNC_GITHUB_ID }}
-          SYNC_GITHUB_KEY: ${{ secrets.SYNC_GITHUB_KEY }}
-          SYNC_GITHUB_URL: ${{ secrets.SYNC_GITHUB_URL }}
-          SYNC_POSTHOG_KEY: ${{ secrets.SYNC_POSTHOG_KEY }}
-          SYNC_POSTHOG_URL: ${{ secrets.SYNC_POSTHOG_URL }}
-          SYNC_ALLOW_FORKS: ${{ secrets.SYNC_ALLOW_FORKS }}
-          SYNC_ALLOW_PRIVATE: ${{ secrets.SYNC_ALLOW_PRIVATE }}
+          GPS_GITHUB_ID: ${{ secrets.GPS_GITHUB_ID }}
+          GPS_GITHUB_KEY: ${{ secrets.GPS_GITHUB_KEY }}
+          GPS_GITHUB_URL: ${{ secrets.GPS_GITHUB_URL }}
+          GPS_POSTHOG_KEY: ${{ secrets.GPS_POSTHOG_KEY }}
+          GPS_POSTHOG_URL: ${{ secrets.GPS_POSTHOG_URL }}
+          GPS_ALLOW_FORKS: ${{ secrets.GPS_ALLOW_FORKS }}
+          GPS_ALLOW_PRIVATE: ${{ secrets.GPS_ALLOW_PRIVATE }}
+          GPS_ALLOW_ARCHIVED: ${{ secrets.GPS_ALLOW_ARCHIVED }}
