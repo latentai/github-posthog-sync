@@ -165,7 +165,7 @@ defmodule GitHubPostHogSync do
       # convert every piece of data into an event payload matching PostHog's API
       Enum.map(data, fn %{"count" => count, "uniques" => uniques, "timestamp" => timestamp} ->
         id = "#{repo}:#{timestamp}:#{statistic}"
-        uid = UUID.uuid5(namespace, id)
+        uid = Uniq.UUID.uuid5(namespace, id)
 
         %{
           "uuid" => uid,
