@@ -17,6 +17,7 @@ defmodule GitHubPostHogSync do
     |> filter_repositories()
     |> locate_statistics()
     |> expand_events()
+    |> filter_events()
     |> buffer_events()
     |> submit_events()
   end
@@ -36,8 +37,8 @@ defmodule GitHubPostHogSync do
   # This can be either an organization, a user, or a whoami(). We will
   # try look for each of these in order until we find a match.
   defp locate_owner(client) do
-    # the configured owner identifier, which can be empty
-    config = Application.get_env(:github_posthog_sync, :github_id)
+    # the configured owner identifier, which can be an empty string
+    config = Application.get_env(:github_posthog_sync, :github_id, "")
 
     # locators to find the owning entity
     locators = [
@@ -122,7 +123,7 @@ defmodule GitHubPostHogSync do
     # lazily process each repository in the stream
     Stream.flat_map(repositories, fn repository ->
       # fetch each group of repo statistics
-      Enum.map(statistics, fn {statistic, _} ->
+      Stream.map(statistics, fn {statistic, _} ->
         # format the path due to lack of Tentacat support
         location = Map.get(repository, "full_name")
         resource = "repos/#{location}/traffic/#{statistic}"
@@ -163,7 +164,7 @@ defmodule GitHubPostHogSync do
     # stream and convert each group of statistics into events
     Stream.flat_map(statistics, fn {repo, statistic, data} ->
       # convert every piece of data into an event payload matching PostHog's API
-      Enum.map(data, fn %{"count" => count, "uniques" => uniques, "timestamp" => timestamp} ->
+      Stream.map(data, fn %{"count" => count, "uniques" => uniques, "timestamp" => timestamp} ->
         id = "#{repo}:#{timestamp}:#{statistic}"
         uid = Uniq.UUID.uuid5(namespace, id)
 
@@ -186,6 +187,53 @@ defmodule GitHubPostHogSync do
   end
 
   @doc false
+  # Filter out duplicate events prior to submission.
+  defp filter_events(events) do
+    # # fetch the PostHog credentials and endpoint for the submisson
+    pid = Application.get_env(:github_posthog_sync, :posthog_id)
+    url = Application.get_env(:github_posthog_sync, :posthog_url)
+    key = Application.get_env(:github_posthog_sync, :posthog_token)
+    uri = "#{url}/api/projects/#{pid}/query"
+
+    cond do
+      # skip filtering if no auth
+      is_nil(pid) or is_nil(key) ->
+        events
+
+      true ->
+        # compute the lower timestamp bound, don't use data to keep stream lazy
+        min =
+          Date.utc_today()
+          |> Date.add(-15)
+          |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+          |> DateTime.to_iso8601()
+
+        # fetch top 10K identifiers
+        res =
+          Req.post!(uri,
+            auth: {:bearer, key},
+            json: %{
+              query: %{
+                kind: "HogQLQuery",
+                query:
+                  "SELECT DISTINCT(uuid) FROM events WHERE timestamp >= toDateTime('#{min}') LIMIT 10000"
+              }
+            }
+          )
+
+        # convert ids to a set
+        has =
+          res.body
+          |> Map.get("results", [])
+          |> List.flatten()
+          |> MapSet.new()
+
+        # filter out the events which already exist
+        Stream.filter(events, &(&1["uuid"] not in has))
+    end
+  end
+
+  @doc false
   # Buffer events into chunks for batched submission.
   defp buffer_events(events),
     do: Stream.chunk_every(events, Application.get_env(:github_posthog_sync, :buffer))
@@ -199,11 +247,11 @@ defmodule GitHubPostHogSync do
     # fetch the PostHog credentials and endpoint for the submisson
     key = Application.get_env(:github_posthog_sync, :posthog_key)
     url = Application.get_env(:github_posthog_sync, :posthog_url)
-    cap = "#{url}/capture?v=3"
+    uri = "#{url}/capture?v=3"
 
     # no stream required now
     Enum.each(events, fn batch ->
-      Req.post!(cap,
+      Req.post!(uri,
         json: %{
           "historical_migration" => true,
           "api_key" => key,

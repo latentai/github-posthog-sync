@@ -27,8 +27,11 @@ look inside `.env.sample` for the full list of supported options, along with
 their defaults. The required options are as follows:
 
 ```
-GPS_GITHUB_KEY=github_pat_*
-GPS_POSTHOG_KEY=phc_*
+# Required GitHub options
+GPS_GITHUB_KEY=github_pat_*     # GitHub read token
+
+# Required PostHog options
+GPS_POSTHOG_KEY=phc_*           # PostHog project key
 ```
 
 By default this tool wil run against the authenticated user via the provided
@@ -41,6 +44,19 @@ GPS_GITHUB_ID=whitfin
 Your GitHub token must have the read-only `Administration` scope for the
 user or organization you're running this tool against. This is required
 to access the Traffic APIs (as they're admin-only).
+
+Although deduplication can be handled at the database level, you are also able
+to perform API based deduplication. To do this simply add a PostHog project
+identifier and Personal API key, to grant access to the PostHog API:
+
+```
+GPS_POSTHOG_ID=111111           # PostHog project identifier
+GPS_POSTHOG_TOKEN=phx_*         # PostHog personal API token
+```
+
+When both of these options are provided this tool will automatically enable
+deduplication via the API. If either is missing, deduplication will be skipped
+(and thus relied upon inside ClickHouse).
 
 ## Under the Hood
 
@@ -63,8 +79,8 @@ in the event:
 
 The sync will use deterministic fields for these values (via UUID v5) to ensure
 that they're the same for the same day. ClickHouse provide eventual consistency
-when it comes to deduplication, so over time and "old" copies of the events will
-age out.
+when it comes to deduplication, so over time any "old" copies of the events will
+age out. This tool will also deduplicate via API queries, just in case.
 
 This also means that the time of day the sync runs is irrelevant, because the only
 value for a day which "matters" happens during the sync 14 days after it occured.
