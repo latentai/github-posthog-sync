@@ -31,7 +31,8 @@ their defaults. The required options are as follows:
 GPS_GITHUB_KEY=github_pat_*     # GitHub read token
 
 # Required PostHog options
-GPS_POSTHOG_KEY=phc_*           # PostHog project key
+GPS_POSTHOG_PHC=phc_*           # PostHog project client token
+GPS_POSTHOG_PHX=phx_*           # PostHog personal authz token
 ```
 
 By default this tool wil run against the authenticated user via the provided
@@ -41,22 +42,13 @@ token, but you can point it to another user or organization via `GPS_GITHUB_ID`:
 GPS_GITHUB_ID=whitfin
 ```
 
-Your GitHub token must have the read-only `Administration` scope for the
-user or organization you're running this tool against. This is required
-to access the Traffic APIs (as they're admin-only).
+Your GitHub token must have the read-only `Administration` scope for the user
+or organization you're running this tool against. This is required to access
+the Traffic APIs (as they're admin-only).
 
-Although deduplication can be handled at the database level, you are also able
-to perform API based deduplication. To do this simply add a PostHog project
-identifier and Personal API key, to grant access to the PostHog API:
-
-```
-GPS_POSTHOG_ID=111111           # PostHog project identifier
-GPS_POSTHOG_TOKEN=phx_*         # PostHog personal API token
-```
-
-When both of these options are provided this tool will automatically enable
-deduplication via the API. If either is missing, deduplication will be skipped
-(and thus relied upon inside ClickHouse).
+Although deduplication can be handled at the database level, this tool also
+handles it at the API level. For this to work properly, make sure your PostHog
+API token has `project:read` and `query:read` scopes.
 
 ## Under the Hood
 
@@ -84,8 +76,9 @@ age out. This tool will also deduplicate via API queries, just in case.
 
 This also means that the time of day the sync runs is irrelevant, because the only
 value for a day which "matters" happens during the sync 14 days after it occured.
-There is no point running the sync more than once per day, as traffic stats appear
-to be updated at by GitHub on that frequency.
+There is no point running the sync more than once per day as traffic stats appear
+to be updated at by GitHub on that frequency, and running more often increases
+the chance of duplicates slipping through the cracks.
 
 ## Development
 

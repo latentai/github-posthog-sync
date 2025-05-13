@@ -15,9 +15,8 @@ config :github_posthog_sync,
   github_url: env!("GPS_GITHUB_URL", :string, "https://api.github.com"),
 
   # PostHog related configuration
-  posthog_id: env!("GPS_POSTHOG_ID", :string?),
-  posthog_key: env!("GPS_POSTHOG_KEY", :string!),
-  posthog_token: env!("GPS_POSTHOG_TOKEN", :string?),
+  posthog_phc: env!("GPS_POSTHOG_PHC", :string!),
+  posthog_phx: env!("GPS_POSTHOG_PHX", :string!),
   posthog_url: env!("GPS_POSTHOG_URL", :string!, "https://us.i.posthog.com"),
 
   # Optional configuration settings

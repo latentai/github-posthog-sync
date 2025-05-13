@@ -190,47 +190,50 @@ defmodule GitHubPostHogSync do
   # Filter out duplicate events prior to submission.
   defp filter_events(events) do
     # # fetch the PostHog credentials and endpoint for the submisson
-    pid = Application.get_env(:github_posthog_sync, :posthog_id)
+    phc = Application.get_env(:github_posthog_sync, :posthog_phc)
+    phx = Application.get_env(:github_posthog_sync, :posthog_phx)
     url = Application.get_env(:github_posthog_sync, :posthog_url)
-    key = Application.get_env(:github_posthog_sync, :posthog_token)
-    uri = "#{url}/api/projects/#{pid}/query"
 
-    cond do
-      # skip filtering if no auth
-      is_nil(pid) or is_nil(key) ->
-        events
+    # fetch the authenticated project list
+    res =
+      Req.get!("#{url}/api/projects", auth: {:bearer, phx})
 
-      true ->
-        # compute the lower timestamp bound, don't use data to keep stream lazy
-        min =
-          Date.utc_today()
-          |> Date.add(-15)
-          |> DateTime.new!(~T[00:00:00], "Etc/UTC")
-          |> DateTime.to_iso8601()
+    # find the project identifier
+    pid =
+      res.body
+      |> Map.get("results", [])
+      |> Enum.find(&(&1["api_token"] == phc))
+      |> Map.get("id")
 
-        # fetch top 10K identifiers
-        res =
-          Req.post!(uri,
-            auth: {:bearer, key},
-            json: %{
-              query: %{
-                kind: "HogQLQuery",
-                query:
-                  "SELECT DISTINCT(uuid) FROM events WHERE timestamp >= toDateTime('#{min}') LIMIT 10000"
-              }
-            }
-          )
+    # compute the lower timestamp bound, don't use data to keep stream lazy
+    min =
+      Date.utc_today()
+      |> Date.add(-15)
+      |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+      |> DateTime.to_iso8601()
 
-        # convert ids to a set
-        has =
-          res.body
-          |> Map.get("results", [])
-          |> List.flatten()
-          |> MapSet.new()
+    # fetch top 10K identifiers
+    res =
+      Req.post!("#{url}/api/projects/#{pid}/query",
+        auth: {:bearer, phx},
+        json: %{
+          query: %{
+            kind: "HogQLQuery",
+            query:
+              "SELECT DISTINCT(uuid) FROM events WHERE timestamp >= toDateTime('#{min}') LIMIT 10000"
+          }
+        }
+      )
 
-        # filter out the events which already exist
-        Stream.filter(events, &(&1["uuid"] not in has))
-    end
+    # convert ids to a set
+    has =
+      res.body
+      |> Map.get("results", [])
+      |> List.flatten()
+      |> MapSet.new()
+
+    # filter out the events which already exist
+    Stream.filter(events, &(&1["uuid"] not in has))
   end
 
   @doc false
@@ -245,16 +248,15 @@ defmodule GitHubPostHogSync do
   # really a migration just to avoid triggering any PostHog limits.
   defp submit_events(events) do
     # fetch the PostHog credentials and endpoint for the submisson
-    key = Application.get_env(:github_posthog_sync, :posthog_key)
+    phc = Application.get_env(:github_posthog_sync, :posthog_phc)
     url = Application.get_env(:github_posthog_sync, :posthog_url)
-    uri = "#{url}/capture?v=3"
 
     # no stream required now
     Enum.each(events, fn batch ->
-      Req.post!(uri,
+      Req.post!("#{url}/batch",
         json: %{
           "historical_migration" => true,
-          "api_key" => key,
+          "api_key" => phc,
           "batch" => batch
         }
       )

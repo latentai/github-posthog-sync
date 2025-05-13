@@ -28,7 +28,8 @@ jobs:
           GPS_GITHUB_ID: ${{ secrets.GPS_GITHUB_ID }}
           GPS_GITHUB_KEY: ${{ secrets.GPS_GITHUB_KEY }}
           GPS_GITHUB_URL: ${{ secrets.GPS_GITHUB_URL }}
-          GPS_POSTHOG_KEY: ${{ secrets.GPS_POSTHOG_KEY }}
+          GPS_POSTHOG_PHC: ${{ secrets.GPS_POSTHOG_PHC }}
+          GPS_POSTHOG_PHX: ${{ secrets.GPS_POSTHOG_PHX }}
           GPS_POSTHOG_URL: ${{ secrets.GPS_POSTHOG_URL }}
           GPS_ALLOW_FORKS: ${{ secrets.GPS_ALLOW_FORKS }}
           GPS_ALLOW_PRIVATE: ${{ secrets.GPS_ALLOW_PRIVATE }}
