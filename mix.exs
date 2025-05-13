@@ -5,7 +5,7 @@ defmodule GitHubPostHogSync.MixProject do
     [
       app: :github_posthog_sync,
       name: "github-posthog-sync",
-      version: "0.0.0",
+      version: "1.1.0",
       elixir: "~> 1.11",
       escript: [main_module: GitHubPostHogSync],
       aliases: [
